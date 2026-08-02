@@ -1,0 +1,83 @@
+If you can only use <unistd.h>, you need to convert the integer into characters yourself and write those characters with write().
+
+
+Recursive:
+#include <unistd.h>
+
+void print_int(int n)
+{
+    char c;
+
+    if (n == -2147483648)
+    {
+        write(STDOUT_FILENO, "-2147483648", 11);
+        return;
+    }
+
+    if (n < 0)
+    {
+        write(STDOUT_FILENO, "-", 1);
+        n = -n;
+    }
+
+    if (n >= 10)
+        print_int(n / 10);
+
+    c = (n % 10) + '0';
+    write(STDOUT_FILENO, &c, 1);
+}
+
+
+
+iterative:
+#include <unistd.h>
+
+void print_int(int n)
+{
+    char buf[12];
+    int i = 0;
+    int neg = 0;
+
+    if (n == 0)
+    {
+        write(STDOUT_FILENO, "0", 1);
+        return;
+    }
+
+    if (n == -2147483648)
+    {
+        write(STDOUT_FILENO, "-2147483648", 11);
+        return;
+    }
+
+    if (n < 0)
+    {
+        neg = 1;
+        n = -n;
+    }
+
+    while (n > 0)
+    {
+        buf[i++] = (n % 10) + '0';
+        n /= 10;
+    }
+
+    if (neg)
+        buf[i++] = '-';
+
+    while (i--)
+        write(STDOUT_FILENO, &buf[i], 1);
+}
+
+
+
+Why this works
+
+An integer like 1234 is stored as a binary value, not as the characters '1', '2', '3', '4'. To print it:
+
+Extract the last digit with n % 10.
+Convert it to its ASCII character by adding '0'.
+Remove the last digit with n /= 10.
+Repeat until no digits remain.
+
+The recursive version prints the digits in the correct order naturally, while the buffer version stores them in reverse and then prints them backwards.

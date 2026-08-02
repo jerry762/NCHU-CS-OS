@@ -1,0 +1,9 @@
+cp /boot/config-$(uname -r) .config
+make olddefconfig
+make -j$(nproc)
+sudo make modules_install
+sudo make install
+
+
+
+code /home/jerry/linux/hello/hello.c /home/jerry/linux/hello/Makefile /home/jerry/linux/include/linux/syscalls.h /home/jerry/linux/Kbuild /home/jerry/linux/arch/x86/entry/syscalls/syscall_64.tbl /home/jerry/linux/hello/test.c
